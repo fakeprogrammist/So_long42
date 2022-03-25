@@ -1,24 +1,49 @@
-#
-#
+NAME		=	so_long
 
-NOM=libmlx.a
-SRC= mlx_shaders.c mlx_new_window.m mlx_init_loop.m mlx_new_image.m mlx_xpm.c mlx_int_str_to_wordtab.c
-SRC+= mlx_png.c mlx_mouse.m
-OBJ1=$(SRC:.c=.o)
-OBJ=$(OBJ1:.m=.o)
-CFLAGS+=-O2
+FLAGS		=	-Wall -Wextra -Werror
 
-# add to match string put with X11 in size and position
-CFLAGS+= -DSTRINGPUTX11
+MAIN		=	start_game.c \
+				handlers.c \
+				keys_hook.c \
 
-all: $(NOM)
+SRC			=	$(SRC_MAIN) $(SRC_MAP) $(SRC_UTLS)
 
-$(NOM):	$(OBJ)
-	ar -r $(NOM) $(OBJ)
-	ranlib $(NOM)
+SRC_MAIN	=	$(addprefix gmplay/, $(MAIN))
+
+
+MAP			=	check_map.c map_options.c \
+				open_sprites.c open_player_sprites.c \
+				draw_static_items.c animations.c\
+
+SRC_MAP		=	$(addprefix map_rendering/, $(MAP))
+
+
+UTLS		=	ft_itoa.c ft_strlen.c \
+				utils1.c utils_mlx.c \
+
+SRC_UTLS	=	$(addprefix utils/, $(UTLS))
+
+
+OBJ			=	*.o
+
+INC			=	-I incs/game.h
+
+LIB			=	-lmlx -framework OpenGL -framework AppKit
+
+
+all: $(NAME)
+
+$(NAME): $(OBJ)
+		@gcc $(FLAGS) $(OBJ) $(INC) $(LIB) -o $(NAME)
+
+
+$(OBJ): $(SRC)
+		@gcc $(FLAGS) -c $(SRC)
 
 clean:
-	rm -f $(NOM) $(OBJ) *~
-	rm -f mlx_app
+		@rm -rf $(OBJ)
 
-re: clean all
+fclean: clean
+		@rm -rf $(NAME)
+
+re: fclean all
